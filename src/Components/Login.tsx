@@ -1,0 +1,90 @@
+import { useState } from 'react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Card } from './ui/card';
+import { UserRole } from '../types';
+import { Package2 } from 'lucide-react';
+import React from 'react';
+
+interface LoginProps {
+  onLogin: (role: UserRole) => void;
+}
+
+export function Login({ onLogin }: LoginProps) {
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState<UserRole>('solicitante');
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setError('Por favor ingresa tu email');
+      return;
+    }
+    setError('');
+    onLogin(role);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center p-4">
+      <Card className="w-full max-w-md p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-[#2D7CF6] rounded-2xl flex items-center justify-center">
+              <Package2 className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-2xl">Marketplace de Servicios</h1>
+          <p className="text-gray-500">
+            Conecta con proveedores de servicios e insumos
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="tu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded-lg"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="role">Tipo de usuario</Label>
+            <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
+              <SelectTrigger className="rounded-lg">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="solicitante">Solicitante de Servicios</SelectItem>
+                <SelectItem value="proveedor-servicio">Proveedor de Servicios</SelectItem>
+                <SelectItem value="proveedor-insumos">Proveedor de Insumos</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-500">{error}</p>
+          )}
+
+          <Button
+            type="submit"
+            className="w-full bg-[#2D7CF6] hover:bg-[#1e5fd4] rounded-lg"
+          >
+            Ingresar
+          </Button>
+        </form>
+
+        <div className="text-center text-sm text-gray-500">
+          <p>¿No tienes cuenta? <span className="text-[#2D7CF6] cursor-pointer">Regístrate</span></p>
+        </div>
+      </Card>
+    </div>
+  );
+}
