@@ -1,4 +1,4 @@
-import { Home, FileText, Package, User, Plus } from 'lucide-react';
+﻿import { Home, FileText, Package, User, Plus } from 'lucide-react';
 import { UserRole } from '../types';
 import React from 'react';
 

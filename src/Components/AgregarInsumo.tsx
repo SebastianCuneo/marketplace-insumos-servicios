@@ -1,11 +1,11 @@
-// Importaciones de React y hooks
+﻿// Importaciones de React y hooks
 import { useState } from 'react';
 // Componentes de interfaz reutilizables (shadcn/ui)
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Card } from './ui/card';
+import { Button } from './ui/button.tsx';
+import { Input } from './ui/input.tsx';
+import { Label } from './ui/label.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.tsx';
+import { Card } from './ui/card.tsx';
 // Iconos de Lucide React
 import { ArrowLeft } from 'lucide-react';
 // Sistema de notificaciones toast

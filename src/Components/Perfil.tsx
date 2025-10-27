@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Badge } from './ui/badge';
+﻿import { useState } from 'react';
+import { Card } from './ui/card.tsx';
+import { Button } from './ui/button.tsx';
+import { Input } from './ui/input.tsx';
+import { Label } from './ui/label.tsx';
+import { Badge } from './ui/badge.tsx';
 import { User, Mail, Phone, Star, LogOut } from 'lucide-react';
 import { UserRole, Usuario } from '../types';
 import { mockUsuarios } from '../data/mockData.ts';

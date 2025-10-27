@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+﻿import { useState } from 'react';
+import { Card } from './ui/card.tsx';
+import { Button } from './ui/button.tsx';
+import { Badge } from './ui/badge.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs.tsx';
 import { Plus, Package, Clock, CheckCircle, FileText } from 'lucide-react';
 import { Servicio } from '../types';
 import { mockServicios } from '../data/mockData.ts';

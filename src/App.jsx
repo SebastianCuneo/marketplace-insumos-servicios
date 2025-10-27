@@ -1,23 +1,23 @@
 // Importaciones principales de React y componentes
 import { useState } from 'react';
 // Componente para mostrar notificaciones toast
-import { Toaster } from './Components/ui/sonner';
+import { Toaster } from './Components/ui/sonner.tsx';
 // Componentes de las diferentes pantallas de la aplicación
-import { Login } from './Components/Login';
-import { SolicitanteDashboard } from './Components/SolicitanteDashboard';
-import { PublicarServicio } from './Components/PublicarServicio';
-import { DetalleServicio } from './Components/DetalleServicio';
-import { Comparador } from './Components/Comparador';
-import { ProveedorServicioDashboard } from './Components/ProveedorServicioDashboard';
-import { EnviarCotizacion } from './Components/EnviarCotizacion';
-import { MisCotizaciones } from './Components/MisCotizaciones';
-import { ProveedorInsumosDashboard } from './Components/ProveedorInsumosDashboard';
-import { AgregarInsumo } from './Components/AgregarInsumo';
-import { OfrecerPack } from './Components/OfrecerPack';
-import { BottomNav } from './Components/BottomNav';
-import { Perfil } from './Components/Perfil';
+import { Login } from './Components/Login.tsx';
+import { SolicitanteDashboard } from './Components/SolicitanteDashboard.tsx';
+import { PublicarServicio } from './Components/PublicarServicio.tsx';
+import { DetalleServicio } from './Components/DetalleServicio.tsx';
+import { Comparador } from './Components/Comparador.tsx';
+import { ProveedorServicioDashboard } from './Components/ProveedorServicioDashboard.tsx';
+import { EnviarCotizacion } from './Components/EnviarCotizacion.tsx';
+import { MisCotizaciones } from './Components/MisCotizaciones.tsx';
+import { ProveedorInsumosDashboard } from './Components/ProveedorInsumosDashboard.tsx';
+import { AgregarInsumo } from './Components/AgregarInsumo.tsx';
+import { OfrecerPack } from './Components/OfrecerPack.tsx';
+import { BottomNav } from './Components/BottomNav.tsx';
+import { Perfil } from './Components/Perfil.tsx';
 // Tipos de TypeScript para definir la estructura de datos
-import { UserRole, Servicio } from './types';
+import { UserRole, Servicio } from './types/index.ts';
 
 // Definición de todas las pantallas posibles en la aplicación
 // type Screen = 'login' | 'dashboard' | 'publicar-servicio' | 'detalle-servicio' | 'comparador' | 'enviar-cotizacion' | 'mis-cotizaciones' | 'agregar-insumo' | 'ofrecer-pack' | 'perfil';

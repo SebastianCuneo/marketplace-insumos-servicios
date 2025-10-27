@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
-import { Card } from './ui/card';
+﻿import { useState } from 'react';
+import { Button } from './ui/button.tsx';
+import { Input } from './ui/input.tsx';
+import { Label } from './ui/label.tsx';
+import { Textarea } from './ui/textarea.tsx';
+import { Card } from './ui/card.tsx';
 import { ArrowLeft, Plus, X } from 'lucide-react';
 import { Servicio } from '../types';
 import { toast } from 'sonner';

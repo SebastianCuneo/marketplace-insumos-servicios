@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+﻿import { useState } from 'react';
+import { Card } from './ui/card.tsx';
+import { Button } from './ui/button.tsx';
+import { Badge } from './ui/badge.tsx';
 import { ArrowLeft, FileText, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { mockCotizaciones, mockServicios } from '../data/mockData.ts';
 import { EstadoCotizacion } from '../types';

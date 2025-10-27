@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+﻿import { useState } from 'react';
+import { Button } from './ui/button.tsx';
+import { Card } from './ui/card.tsx';
+import { Badge } from './ui/badge.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs.tsx';
 import { ArrowLeft, MapPin, Calendar, Package, Star, CheckCircle } from 'lucide-react';
 import { Servicio } from '../types';
 import { mockCotizaciones, mockOfertasInsumos } from '../data/mockData.ts';
