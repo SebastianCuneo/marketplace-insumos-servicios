@@ -7,6 +7,7 @@ import { Card } from './ui/card.tsx';
 import { UserRole } from '../types';
 import { Package2 } from 'lucide-react';
 import React from 'react';
+import { useAuth } from '../Context/AuthContext.tsx';
 
 interface LoginProps {
   onLogin: (role: UserRole) => void;
@@ -14,17 +15,36 @@ interface LoginProps {
 
 export function Login({ onLogin }: LoginProps) {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('solicitante');
   const [error, setError] = useState('');
+  const { login } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar que haya email y contraseña
     if (!email) {
       setError('Por favor ingresa tu email');
       return;
     }
-    setError('');
-    onLogin(role);
+    
+    if (!password) {
+      setError('Por favor ingresa tu contraseña');
+      return;
+    }
+    
+    // Intentar hacer login con el contexto
+    const success = login(email, password);
+    
+    if (success) {
+      // Login exitoso, limpiar error y continuar al dashboard
+      setError('');
+      onLogin(role);
+    } else {
+      // Login fallido, mostrar error
+      setError('Email o contraseña incorrectos');
+    }
   };
 
   return (
@@ -51,6 +71,18 @@ export function Login({ onLogin }: LoginProps) {
               placeholder="tu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="rounded-lg"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">Contraseña</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Ingresa tu contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="rounded-lg"
             />
           </div>
@@ -83,6 +115,15 @@ export function Login({ onLogin }: LoginProps) {
 
         <div className="text-center text-sm text-gray-500">
           <p>¿No tienes cuenta? <span className="text-[#2D7CF6] cursor-pointer">Regístrate</span></p>
+        </div>
+
+        {/* Credenciales de prueba */}
+        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-xs font-semibold text-blue-900 mb-2">🔑 Credenciales de prueba:</p>
+          <div className="text-xs text-blue-800 space-y-1">
+            <p><strong>Admin:</strong> admin@example.com / admin</p>
+            <p><strong>Usuario:</strong> user@example.com / user</p>
+          </div>
         </div>
       </Card>
     </div>

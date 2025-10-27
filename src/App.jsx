@@ -18,6 +18,7 @@ import { BottomNav } from './Components/BottomNav.tsx';
 import { Perfil } from './Components/Perfil.tsx';
 // Tipos de TypeScript para definir la estructura de datos
 import { UserRole, Servicio } from './types/index.ts';
+import { AuthProvider } from './Context/AuthContext.tsx';
 
 // Definición de todas las pantallas posibles en la aplicación
 // type Screen = 'login' | 'dashboard' | 'publicar-servicio' | 'detalle-servicio' | 'comparador' | 'enviar-cotizacion' | 'mis-cotizaciones' | 'agregar-insumo' | 'ofrecer-pack' | 'perfil';
