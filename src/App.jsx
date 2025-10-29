@@ -2,6 +2,8 @@
 import { useState } from 'react';
 // Componente para mostrar notificaciones toast
 import { Toaster } from './Components/ui/sonner.tsx';
+// Hook para acceder al contexto de autenticación
+import { useAuth } from './Context/AuthContext.tsx';
 // Componentes de las diferentes pantallas de la aplicación
 import { Login } from './Components/Login.tsx';
 import { SolicitanteDashboard } from './Components/SolicitanteDashboard.tsx';
@@ -17,13 +19,12 @@ import { OfrecerPack } from './Components/OfrecerPack.tsx';
 import { BottomNav } from './Components/BottomNav.tsx';
 import { Perfil } from './Components/Perfil.tsx';
 // Tipos de TypeScript para definir la estructura de datos
-import { UserRole, Servicio } from './types/index.ts';
-import { AuthProvider } from './Context/AuthContext.tsx';
-
-// Definición de todas las pantallas posibles en la aplicación
-// type Screen = 'login' | 'dashboard' | 'publicar-servicio' | 'detalle-servicio' | 'comparador' | 'enviar-cotizacion' | 'mis-cotizaciones' | 'agregar-insumo' | 'ofrecer-pack' | 'perfil';
+import { Servicio } from './types/index.ts';
 
 export default function App() {
+  // Acceso al contexto de autenticación
+  const { logout: authLogout } = useAuth();
+  
   // Estados principales de la aplicación
   const [currentScreen, setCurrentScreen] = useState('login'); // Pantalla actual
   const [userRole, setUserRole] = useState('solicitante'); // Rol del usuario
@@ -44,6 +45,7 @@ export default function App() {
 
   // Función para manejar el logout del usuario
   const handleLogout = () => {
+    authLogout(); // Limpia el usuario del contexto de autenticación
     setCurrentScreen('login'); // Regresa a la pantalla de login
     setUserRole('solicitante'); // Resetea el rol
     setActiveTab('servicios'); // Resetea la pestaña activa
