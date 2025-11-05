@@ -7,14 +7,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card } from './ui/card.tsx';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Insumo } from '../types';
+import type { Insumo, Servicio } from '../types';
 import React from 'react';
+import { useAuth, useServices } from '../contexts/index.ts';
+import { SERVICE_STATES } from '../constants/serviceStates.ts';
+import { SERVICE_CATEGORIES } from '../constants/categories.ts';
 
 interface PublicarServicioProps {
   onVolver: () => void;
 }
 
 export function PublicarServicio({ onVolver }: PublicarServicioProps) {
+  // Contexts
+  const { user } = useAuth();
+  const { addService } = useServices();
+  
+  // Estados del formulario
   const [titulo, setTitulo] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [direccion, setDireccion] = useState('');
@@ -45,10 +53,44 @@ export function PublicarServicio({ onVolver }: PublicarServicioProps) {
   };
 
   const handlePublicar = () => {
+    // Validar campos obligatorios
     if (!titulo || !descripcion || !direccion || !ciudad || !fecha || !categoria) {
       toast.error('Por favor completa todos los campos obligatorios');
       return;
     }
+    
+    // Validar insumos
+    const insumosValidos = insumos.filter(i => i.nombre && i.cantidad > 0 && i.unidad);
+    if (insumosValidos.length === 0) {
+      toast.error('Debes agregar al menos un insumo válido');
+      return;
+    }
+    
+    // Validar usuario logueado
+    if (!user) {
+      toast.error('Debes estar logueado para publicar un servicio');
+      return;
+    }
+    
+    // Crear servicio
+    const nuevoServicio: Servicio = {
+      id: `srv-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      solicitanteId: user.id,
+      titulo,
+      descripcion,
+      categoria,
+      direccion,
+      ciudad,
+      fecha,
+      fechaPreferida: fecha,
+      insumos: insumosValidos,
+      insumosRequeridos: insumosValidos,
+      estado: SERVICE_STATES.PUBLICADO,
+    };
+    
+    // Guardar en Context
+    addService(nuevoServicio);
+    
     toast.success('Servicio publicado exitosamente');
     onVolver();
   };
@@ -106,13 +148,14 @@ export function PublicarServicio({ onVolver }: PublicarServicioProps) {
                     <SelectValue placeholder="Selecciona una categoría" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="construccion">Construcción</SelectItem>
-                    <SelectItem value="electricidad">Electricidad</SelectItem>
-                    <SelectItem value="plomeria">Plomería</SelectItem>
-                    <SelectItem value="pintura">Pintura</SelectItem>
-                    <SelectItem value="jardineria">Jardinería</SelectItem>
-                    <SelectItem value="limpieza">Limpieza</SelectItem>
-                    <SelectItem value="otros">Otros</SelectItem>
+                  <SelectItem value={SERVICE_CATEGORIES.CONSTRUCCION}>Construcción</SelectItem>
+    <SelectItem value={SERVICE_CATEGORIES.ELECTRICIDAD}>Electricidad</SelectItem>
+    <SelectItem value={SERVICE_CATEGORIES.PLOMERIA}>Plomería</SelectItem>
+    <SelectItem value={SERVICE_CATEGORIES.JARDINERIA}>Jardinería</SelectItem>
+    <SelectItem value={SERVICE_CATEGORIES.LIMPIEZA}>Limpieza</SelectItem>
+    <SelectItem value={SERVICE_CATEGORIES.PINTURA}>Pintura</SelectItem>
+    <SelectItem value={SERVICE_CATEGORIES.PISCINAS}>Piscinas</SelectItem>
+    <SelectItem value={SERVICE_CATEGORIES.OTROS}>Otros</SelectItem> 
                   </SelectContent>
                 </Select>
               </div>

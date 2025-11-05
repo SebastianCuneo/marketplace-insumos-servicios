@@ -1,7 +1,18 @@
-export type UserRole = 'solicitante' | 'proveedor-servicio' | 'proveedor-insumos';
+/**
+ * Tipos del Sistema - Marketplace de Servicios con Insumos
+ * Fuente de Verdad: CONTEXTO_PROYECTO_GEMA.md
+ */
 
-export type EstadoServicio = 'publicado' | 'asignado' | 'completado' | 'borrador';
+// Importar constantes (source of truth)
+import { UserRole } from '../constants/roles';
+import { ServiceState } from '../constants/serviceStates';
+
+// Tipos de estado de cotización
 export type EstadoCotizacion = 'enviada' | 'retirada' | 'aceptada';
+
+// Re-exportar para compatibilidad
+export type { UserRole, ServiceState };
+export type EstadoServicio = ServiceState; // Alias legacy
 
 export interface Usuario {
   id: string;
@@ -25,10 +36,12 @@ export interface Servicio {
   descripcion: string;
   direccion: string;
   ciudad: string;
-  fecha: string;
+  fecha: string; // Legacy
+  fechaPreferida: string; // Según TP
   categoria: string;
   estado: EstadoServicio;
-  insumos: Insumo[];
+  insumos: Insumo[]; // Legacy
+  insumosRequeridos: Insumo[]; // Según TP
   solicitanteId: string;
   cotizaciones?: Cotizacion[];
   ofertas?: OfertaInsumos[];

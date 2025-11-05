@@ -1,3 +1,5 @@
+import { ROLES } from '../constants/roles.ts';
+import { SERVICE_STATES } from '../constants/serviceStates.ts';
 import { Servicio, Cotizacion, InsumosCatalogo, OfertaInsumos, Usuario } from '../types';
 
 export const mockUsuarios: Usuario[] = [
@@ -5,14 +7,14 @@ export const mockUsuarios: Usuario[] = [
     id: '1',
     nombre: 'Juan Pérez',
     email: 'juan@example.com',
-    rol: 'solicitante',
+    rol: ROLES.SOLICITANTE,
     telefono: '+34 600 123 456',
   },
   {
     id: '2',
     nombre: 'María García',
     email: 'maria@example.com',
-    rol: 'proveedor-servicio',
+    rol: ROLES.PROVEEDOR_SERVICIO,
     telefono: '+34 600 234 567',
     rating: 4.8,
   },
@@ -20,7 +22,7 @@ export const mockUsuarios: Usuario[] = [
     id: '3',
     nombre: 'Carlos López',
     email: 'carlos@example.com',
-    rol: 'proveedor-insumos',
+    rol: ROLES.PROVEEDOR_INSUMOS,
     telefono: '+34 600 345 678',
     rating: 4.5,
   },
@@ -34,10 +36,16 @@ export const mockServicios: Servicio[] = [
     direccion: 'Calle Mayor 123',
     ciudad: 'Madrid',
     fecha: '2025-11-15',
+    fechaPreferida: '2025-11-15',
     categoria: 'Construcción',
-    estado: 'publicado',
+    estado: SERVICE_STATES.PUBLICADO,
     solicitanteId: '1',
     insumos: [
+      { id: 'i1', nombre: 'Cemento', cantidad: 10, unidad: 'sacos' },
+      { id: 'i2', nombre: 'Azulejos', cantidad: 25, unidad: 'm²' },
+      { id: 'i3', nombre: 'Pintura', cantidad: 5, unidad: 'litros' },
+    ],
+    insumosRequeridos: [
       { id: 'i1', nombre: 'Cemento', cantidad: 10, unidad: 'sacos' },
       { id: 'i2', nombre: 'Azulejos', cantidad: 25, unidad: 'm²' },
       { id: 'i3', nombre: 'Pintura', cantidad: 5, unidad: 'litros' },
@@ -50,11 +58,16 @@ export const mockServicios: Servicio[] = [
     direccion: 'Avenida Diagonal 456',
     ciudad: 'Barcelona',
     fecha: '2025-11-20',
+    fechaPreferida: '2025-11-20',
     categoria: 'Electricidad',
-    estado: 'asignado',
+    estado: SERVICE_STATES.ASIGNADO,
     solicitanteId: '1',
     cotizacionSeleccionada: 'cot-3',
     insumos: [
+      { id: 'i4', nombre: 'Cable eléctrico', cantidad: 100, unidad: 'metros' },
+      { id: 'i5', nombre: 'Enchufes', cantidad: 20, unidad: 'unidades' },
+    ],
+    insumosRequeridos: [
       { id: 'i4', nombre: 'Cable eléctrico', cantidad: 100, unidad: 'metros' },
       { id: 'i5', nombre: 'Enchufes', cantidad: 20, unidad: 'unidades' },
     ],
@@ -66,10 +79,15 @@ export const mockServicios: Servicio[] = [
     direccion: 'Plaza España 789',
     ciudad: 'Valencia',
     fecha: '2025-12-01',
+    fechaPreferida: '2025-12-01',
     categoria: 'Pintura',
-    estado: 'publicado',
+    estado: SERVICE_STATES.PUBLICADO,
     solicitanteId: '1',
     insumos: [
+      { id: 'i6', nombre: 'Pintura exterior', cantidad: 50, unidad: 'litros' },
+      { id: 'i7', nombre: 'Rodillos', cantidad: 10, unidad: 'unidades' },
+    ],
+    insumosRequeridos: [
       { id: 'i6', nombre: 'Pintura exterior', cantidad: 50, unidad: 'litros' },
       { id: 'i7', nombre: 'Rodillos', cantidad: 10, unidad: 'unidades' },
     ],

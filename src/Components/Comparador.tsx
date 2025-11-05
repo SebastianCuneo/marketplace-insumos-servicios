@@ -1,13 +1,11 @@
-﻿import { useState } from 'react';
-import { Button } from './ui/button.tsx';
+﻿import { Button } from './ui/button.tsx';
 import { Card } from './ui/card.tsx';
 import { Badge } from './ui/badge.tsx';
 import { ArrowLeft, Star, CheckCircle, Clock, Euro } from 'lucide-react';
 import { Servicio } from '../types';
-import { mockCotizaciones } from '../data/mockData.ts';
 import { toast } from 'sonner';
 import React from 'react';
-
+import { useServices } from '../contexts/index.ts';
 
 interface ComparadorProps {
   servicio: Servicio;
@@ -15,12 +13,14 @@ interface ComparadorProps {
 }
 
 export function Comparador({ servicio, onVolver }: ComparadorProps) {
-  const [seleccionada, setSeleccionada] = useState<string | null>(servicio.cotizacionSeleccionada || null);
-  const cotizaciones = mockCotizaciones.filter(c => c.servicioId === servicio.id);
+  const { state, selectQuotation } = useServices();
+  const cotizaciones = state.quotes.filter(c => c.servicioId === servicio.id);
 
   const handleSeleccionar = (id: string) => {
-    setSeleccionada(id);
-    toast.success('Cotización seleccionada');
+    selectQuotation(servicio.id, id);
+    toast.success('Cotización seleccionada - Servicio asignado');
+    // Esperar un poco antes de volver para que el usuario vea el mensaje
+    setTimeout(() => onVolver(), 1500);
   };
 
   return (
@@ -46,7 +46,7 @@ export function Comparador({ servicio, onVolver }: ComparadorProps) {
         <div className="md:hidden space-y-4">
           {cotizaciones.map((cotizacion) => (
             <Card key={cotizacion.id} className={`p-6 rounded-lg ${
-              seleccionada === cotizacion.id ? 'border-2 border-[#2D7CF6]' : ''
+              servicio.cotizacionSeleccionada === cotizacion.id ? 'border-2 border-[#2D7CF6]' : ''
             }`}>
               <div className="space-y-4">
                 <div className="flex justify-between items-start">
@@ -57,7 +57,7 @@ export function Comparador({ servicio, onVolver }: ComparadorProps) {
                       <span className="text-sm">{cotizacion.proveedorRating}</span>
                     </div>
                   </div>
-                  {seleccionada === cotizacion.id && (
+                  {servicio.cotizacionSeleccionada === cotizacion.id && (
                     <Badge className="bg-green-100 text-green-700">
                       Seleccionada
                     </Badge>
@@ -96,12 +96,12 @@ export function Comparador({ servicio, onVolver }: ComparadorProps) {
                 <Button
                   onClick={() => handleSeleccionar(cotizacion.id)}
                   className={`w-full rounded-lg ${
-                    seleccionada === cotizacion.id
+                    servicio.cotizacionSeleccionada === cotizacion.id
                       ? 'bg-green-600 hover:bg-green-700'
                       : 'bg-[#2D7CF6] hover:bg-[#1e5fd4]'
                   }`}
                 >
-                  {seleccionada === cotizacion.id ? 'Seleccionada' : 'Seleccionar'}
+                  {servicio.cotizacionSeleccionada === cotizacion.id ? 'Seleccionada' : 'Seleccionar'}
                 </Button>
               </div>
             </Card>
@@ -119,7 +119,7 @@ export function Comparador({ servicio, onVolver }: ComparadorProps) {
                     {cotizaciones.map((cotizacion) => (
                       <th key={cotizacion.id} className="p-4 text-center">
                         <div className={`${
-                          seleccionada === cotizacion.id ? 'bg-blue-50 border-2 border-[#2D7CF6]' : ''
+                          servicio.cotizacionSeleccionada === cotizacion.id ? 'bg-blue-50 border-2 border-[#2D7CF6]' : ''
                         } p-3 rounded-lg`}>
                           <p className="mb-1">{cotizacion.proveedorNombre}</p>
                           <div className="flex items-center justify-center gap-1">
@@ -199,12 +199,12 @@ export function Comparador({ servicio, onVolver }: ComparadorProps) {
                         <Button
                           onClick={() => handleSeleccionar(cotizacion.id)}
                           className={`w-full rounded-lg ${
-                            seleccionada === cotizacion.id
+                            servicio.cotizacionSeleccionada === cotizacion.id
                               ? 'bg-green-600 hover:bg-green-700'
                               : 'bg-[#2D7CF6] hover:bg-[#1e5fd4]'
                           }`}
                         >
-                          {seleccionada === cotizacion.id ? (
+                          {servicio.cotizacionSeleccionada === cotizacion.id ? (
                             <>
                               <CheckCircle className="w-4 h-4 mr-2" />
                               Seleccionada

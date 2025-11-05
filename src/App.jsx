@@ -2,8 +2,8 @@
 import { useState } from 'react';
 // Componente para mostrar notificaciones toast
 import { Toaster } from './Components/ui/sonner.tsx';
-// Hook para acceder al contexto de autenticación
-import { useAuth } from './Context/AuthContext.tsx';
+// Hooks para acceder a los contextos
+import { useAuth } from './contexts/index.ts';
 // Componentes de las diferentes pantallas de la aplicación
 import { Login } from './Components/Login.tsx';
 import { SolicitanteDashboard } from './Components/SolicitanteDashboard.tsx';
@@ -23,20 +23,18 @@ import { Servicio } from './types/index.ts';
 
 export default function App() {
   // Acceso al contexto de autenticación
-  const { logout: authLogout } = useAuth();
+  const { logout, user, isAuthenticated } = useAuth();
   
   // Estados principales de la aplicación
   const [currentScreen, setCurrentScreen] = useState('login'); // Pantalla actual
-  const [userRole, setUserRole] = useState('solicitante'); // Rol del usuario
   const [activeTab, setActiveTab] = useState('servicios'); // Pestaña activa en el dashboard
   const [selectedServicio, setSelectedServicio] = useState(null); // Servicio seleccionado
 
   // Función para manejar el login del usuario
-  const handleLogin = (role) => {
-    setUserRole(role); // Establece el rol del usuario
+  const handleLogin = () => {
     setCurrentScreen('dashboard'); // Va al dashboard principal
-    // Configura la pestaña inicial según el rol
-    if (role === 'proveedor-insumos') {
+    // Configura la pestaña inicial según el rol del usuario autenticado
+    if (user?.rol === 'PROVEEDOR_INSUMOS') {
       setActiveTab('catalogo'); // Los proveedores de insumos ven el catálogo
     } else {
       setActiveTab('servicios'); // Otros roles ven servicios
@@ -45,9 +43,8 @@ export default function App() {
 
   // Función para manejar el logout del usuario
   const handleLogout = () => {
-    authLogout(); // Limpia el usuario del contexto de autenticación
+    logout(); // Limpia el usuario del contexto de autenticación
     setCurrentScreen('login'); // Regresa a la pantalla de login
-    setUserRole('solicitante'); // Resetea el rol
     setActiveTab('servicios'); // Resetea la pestaña activa
     setSelectedServicio(null); // Limpia el servicio seleccionado
   };
@@ -56,7 +53,9 @@ export default function App() {
     setActiveTab(tab);
     
     // Handle navigation based on role and tab
-    if (userRole === 'solicitante') {
+    const userRole = user?.rol;
+    
+    if (userRole === 'SOLICITANTE') {
       switch (tab) {
         case 'servicios':
           setCurrentScreen('dashboard');
@@ -68,7 +67,7 @@ export default function App() {
           setCurrentScreen('perfil');
           break;
       }
-    } else if (userRole === 'proveedor-servicio') {
+    } else if (userRole === 'PROVEEDOR_SERVICIO') {
       switch (tab) {
         case 'servicios':
           setCurrentScreen('dashboard');
@@ -80,13 +79,12 @@ export default function App() {
           setCurrentScreen('perfil');
           break;
       }
-    } else if (userRole === 'proveedor-insumos') {
+    } else if (userRole === 'PROVEEDOR_INSUMOS') {
       switch (tab) {
         case 'catalogo':
           setCurrentScreen('dashboard');
           break;
         case 'ofertas':
-          // Could add a screen for offers
           setCurrentScreen('dashboard');
           break;
         case 'perfil':
@@ -116,14 +114,14 @@ export default function App() {
         return <Login onLogin={handleLogin} />;
 
       case 'dashboard':
-        if (userRole === 'solicitante') {
+        if (user?.rol === 'SOLICITANTE') {
           return (
             <SolicitanteDashboard
               onPublicarServicio={() => setCurrentScreen('publicar-servicio')}
               onVerDetalle={handleVerDetalle}
             />
           );
-        } else if (userRole === 'proveedor-servicio') {
+        } else if (user?.rol === 'PROVEEDOR_SERVICIO') {
           return (
             <ProveedorServicioDashboard
               onVerServicio={handleVerDetalle}
@@ -155,7 +153,7 @@ export default function App() {
           <DetalleServicio
             servicio={selectedServicio}
             onVolver={() => setCurrentScreen('dashboard')}
-            onComparar={userRole === 'solicitante' ? handleComparar : undefined}
+            onComparar={user?.rol === 'SOLICITANTE' ? handleComparar : undefined}
           />
         ) : null;
 
@@ -208,7 +206,7 @@ export default function App() {
       case 'perfil':
         return (
           <Perfil
-            role={userRole}
+            role={user?.rol || 'SOLICITANTE'}
             onLogout={handleLogout}
           />
         );
@@ -222,9 +220,9 @@ export default function App() {
     <div className="min-h-screen">
       {renderScreen()}
       
-      {currentScreen !== 'login' && (
+      {currentScreen !== 'login' && user && (
         <BottomNav
-          role={userRole}
+          role={user.rol}
           activeTab={activeTab}
           onTabChange={handleTabChange}
         />

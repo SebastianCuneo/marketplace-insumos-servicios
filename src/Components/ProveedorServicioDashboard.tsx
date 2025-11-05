@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs.tsx';
 import { Search, MapPin, Calendar, Package, Filter } from 'lucide-react';
 import { Servicio } from '../types';
-import { mockServicios } from '../data/mockData.ts';
 import React from 'react';
+import { useServices } from '../contexts/index.ts';
+import { SERVICE_STATES } from '../constants/serviceStates.ts';
 
 interface ProveedorServicioDashboardProps {
   onVerServicio: (servicio: Servicio) => void;
@@ -21,11 +22,14 @@ export function ProveedorServicioDashboard({
   onEnviarCotizacion,
   onVerMisCotizaciones 
 }: ProveedorServicioDashboardProps) {
+  const { services } = useServices();
   const [busqueda, setBusqueda] = useState('');
   const [categoriaFiltro, setCategoriaFiltro] = useState('todas');
   const [ciudadFiltro, setCiudadFiltro] = useState('todas');
 
-  const serviciosDisponibles = mockServicios.filter(s => s.estado === 'publicado');
+  const serviciosDisponibles = services.filter(s => 
+    s.estado === SERVICE_STATES.PUBLICADO || s.estado === SERVICE_STATES.EN_EVALUACION
+  );
 
   const serviciosFiltrados = serviciosDisponibles.filter(servicio => {
     const matchBusqueda = servicio.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -57,11 +61,11 @@ export function ProveedorServicioDashboard({
         </div>
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-[#2D7CF6]" />
-          <span>{new Date(servicio.fecha).toLocaleDateString('es-ES')}</span>
+          <span>{new Date(servicio.fechaPreferida || servicio.fecha).toLocaleDateString('es-ES')}</span>
         </div>
         <div className="flex items-center gap-2">
           <Package className="w-4 h-4 text-[#2D7CF6]" />
-          <span>{servicio.insumos.length} insumos requeridos</span>
+          <span>{(servicio.insumosRequeridos || servicio.insumos).length} insumos requeridos</span>
         </div>
       </div>
 
