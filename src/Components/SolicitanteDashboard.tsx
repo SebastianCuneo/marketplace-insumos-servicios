@@ -1,11 +1,11 @@
-﻿import { useState } from 'react';
-import { Card } from './ui/card.tsx';
+﻿import { Card } from './ui/card.tsx';
 import { Button } from './ui/button.tsx';
 import { Badge } from './ui/badge.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs.tsx';
 import { Plus, Package, Clock, CheckCircle, FileText } from 'lucide-react';
 import { Servicio } from '../types';
-import { mockServicios } from '../data/mockData.ts';
+import { useAuth, useServices } from '../contexts/index.ts';
+import { SERVICE_STATES } from '../constants/serviceStates.ts';
 import React from 'react';
 
 interface SolicitanteDashboardProps {
@@ -14,25 +14,31 @@ interface SolicitanteDashboardProps {
 }
 
 export function SolicitanteDashboard({ onPublicarServicio, onVerDetalle }: SolicitanteDashboardProps) {
-  const [servicios] = useState<Servicio[]>(mockServicios);
+  const { user } = useAuth();
+  const { services } = useServices();
+  
+  // Filtrar solo los servicios del usuario actual
+  const servicios = services.filter(s => s.solicitanteId === user?.id);
 
   const getEstadoBadge = (estado: string) => {
     const styles = {
-      publicado: 'bg-blue-100 text-blue-700',
-      asignado: 'bg-yellow-100 text-yellow-700',
-      completado: 'bg-green-100 text-green-700',
-      borrador: 'bg-gray-100 text-gray-700',
+      [SERVICE_STATES.PUBLICADO]: 'bg-blue-100 text-blue-700',
+      [SERVICE_STATES.EN_EVALUACION]: 'bg-purple-100 text-purple-700',
+      [SERVICE_STATES.ASIGNADO]: 'bg-yellow-100 text-yellow-700',
+      [SERVICE_STATES.COMPLETADO]: 'bg-green-100 text-green-700',
     };
-    return styles[estado as keyof typeof styles] || styles.publicado;
+    return styles[estado as keyof typeof styles] || styles[SERVICE_STATES.PUBLICADO];
   };
 
   const getEstadoIcon = (estado: string) => {
     switch (estado) {
-      case 'publicado':
+      case SERVICE_STATES.PUBLICADO:
         return <Package className="w-4 h-4" />;
-      case 'asignado':
+      case SERVICE_STATES.EN_EVALUACION:
+        return <FileText className="w-4 h-4" />;
+      case SERVICE_STATES.ASIGNADO:
         return <Clock className="w-4 h-4" />;
-      case 'completado':
+      case SERVICE_STATES.COMPLETADO:
         return <CheckCircle className="w-4 h-4" />;
       default:
         return <FileText className="w-4 h-4" />;
@@ -63,15 +69,21 @@ export function SolicitanteDashboard({ onPublicarServicio, onVerDetalle }: Solic
       <div className="space-y-2 text-sm text-gray-600">
         <div className="flex justify-between">
           <span>📍 {servicio.ciudad}</span>
-          <span>📅 {new Date(servicio.fecha).toLocaleDateString('es-ES')}</span>
+          <span>📅 {new Date(servicio.fechaPreferida).toLocaleDateString('es-ES')}</span>
         </div>
         <div className="flex justify-between items-center pt-2 border-t">
-          <span>{servicio.insumos.length} insumos requeridos</span>
-          {servicio.estado === 'publicado' && (
-            <span className="text-[#2D7CF6]">Ver cotizaciones →</span>
+          <span>{servicio.insumosRequeridos.length} insumos requeridos</span>
+          {servicio.estado === SERVICE_STATES.PUBLICADO && (
+            <span className="text-[#2D7CF6]">Esperando cotizaciones →</span>
           )}
-          {servicio.estado === 'asignado' && (
+          {servicio.estado === SERVICE_STATES.EN_EVALUACION && (
+            <span className="text-purple-600">Ver cotizaciones →</span>
+          )}
+          {servicio.estado === SERVICE_STATES.ASIGNADO && (
             <span className="text-green-600">✓ Cotización seleccionada</span>
+          )}
+          {servicio.estado === SERVICE_STATES.COMPLETADO && (
+            <span className="text-gray-600">✓ Completado</span>
           )}
         </div>
       </div>
@@ -98,7 +110,12 @@ export function SolicitanteDashboard({ onPublicarServicio, onVerDetalle }: Solic
               </div>
               <div>
                 <p className="text-sm text-gray-500">Publicados</p>
-                <p className="text-2xl">{servicios.filter(s => s.estado === 'publicado').length}</p>
+                <p className="text-2xl">
+                  {servicios.filter(s => 
+                    s.estado === SERVICE_STATES.PUBLICADO || 
+                    s.estado === SERVICE_STATES.EN_EVALUACION
+                  ).length}
+                </p>
               </div>
             </div>
           </Card>
@@ -110,7 +127,7 @@ export function SolicitanteDashboard({ onPublicarServicio, onVerDetalle }: Solic
               </div>
               <div>
                 <p className="text-sm text-gray-500">En progreso</p>
-                <p className="text-2xl">{servicios.filter(s => s.estado === 'asignado').length}</p>
+                <p className="text-2xl">{servicios.filter(s => s.estado === SERVICE_STATES.ASIGNADO).length}</p>
               </div>
             </div>
           </Card>
@@ -122,7 +139,7 @@ export function SolicitanteDashboard({ onPublicarServicio, onVerDetalle }: Solic
               </div>
               <div>
                 <p className="text-sm text-gray-500">Completados</p>
-                <p className="text-2xl">{servicios.filter(s => s.estado === 'completado').length}</p>
+                <p className="text-2xl">{servicios.filter(s => s.estado === SERVICE_STATES.COMPLETADO).length}</p>
               </div>
             </div>
           </Card>
@@ -132,37 +149,59 @@ export function SolicitanteDashboard({ onPublicarServicio, onVerDetalle }: Solic
         <Tabs defaultValue="todos" className="space-y-4">
           <TabsList className="bg-white rounded-lg">
             <TabsTrigger value="todos" className="rounded-lg">Todos</TabsTrigger>
-            <TabsTrigger value="publicado" className="rounded-lg">Publicados</TabsTrigger>
-            <TabsTrigger value="asignado" className="rounded-lg">Asignados</TabsTrigger>
-            <TabsTrigger value="completado" className="rounded-lg">Completados</TabsTrigger>
+            <TabsTrigger value={SERVICE_STATES.PUBLICADO} className="rounded-lg">Publicados</TabsTrigger>
+            <TabsTrigger value={SERVICE_STATES.ASIGNADO} className="rounded-lg">Asignados</TabsTrigger>
+            <TabsTrigger value={SERVICE_STATES.COMPLETADO} className="rounded-lg">Completados</TabsTrigger>
           </TabsList>
 
           <TabsContent value="todos" className="space-y-4">
-            {filtrarServicios('todos').map(servicio => (
-              <ServicioCard key={servicio.id} servicio={servicio} />
-            ))}
+            {servicios.length === 0 ? (
+              <Card className="p-12 text-center rounded-lg">
+                <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">No has publicado servicios aún</p>
+                <p className="text-sm text-gray-400 mt-2">Haz clic en el botón + para crear tu primer servicio</p>
+              </Card>
+            ) : (
+              filtrarServicios('todos').map(servicio => (
+                <ServicioCard key={servicio.id} servicio={servicio} />
+              ))
+            )}
           </TabsContent>
 
-          <TabsContent value="publicado" className="space-y-4">
-            {filtrarServicios('publicado').map(servicio => (
-              <ServicioCard key={servicio.id} servicio={servicio} />
-            ))}
+          <TabsContent value={SERVICE_STATES.PUBLICADO} className="space-y-4">
+            {filtrarServicios(SERVICE_STATES.PUBLICADO).length === 0 ? (
+              <Card className="p-12 text-center rounded-lg">
+                <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">No tienes servicios publicados</p>
+              </Card>
+            ) : (
+              filtrarServicios(SERVICE_STATES.PUBLICADO).map(servicio => (
+                <ServicioCard key={servicio.id} servicio={servicio} />
+              ))
+            )}
           </TabsContent>
 
-          <TabsContent value="asignado" className="space-y-4">
-            {filtrarServicios('asignado').map(servicio => (
-              <ServicioCard key={servicio.id} servicio={servicio} />
-            ))}
+          <TabsContent value={SERVICE_STATES.ASIGNADO} className="space-y-4">
+            {filtrarServicios(SERVICE_STATES.ASIGNADO).length === 0 ? (
+              <Card className="p-12 text-center rounded-lg">
+                <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">No tienes servicios asignados</p>
+              </Card>
+            ) : (
+              filtrarServicios(SERVICE_STATES.ASIGNADO).map(servicio => (
+                <ServicioCard key={servicio.id} servicio={servicio} />
+              ))
+            )}
           </TabsContent>
 
-          <TabsContent value="completado" className="space-y-4">
-            {filtrarServicios('completado').length === 0 ? (
+          <TabsContent value={SERVICE_STATES.COMPLETADO} className="space-y-4">
+            {filtrarServicios(SERVICE_STATES.COMPLETADO).length === 0 ? (
               <Card className="p-12 text-center rounded-lg">
                 <CheckCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-500">Aún no tienes servicios completados</p>
               </Card>
             ) : (
-              filtrarServicios('completado').map(servicio => (
+              filtrarServicios(SERVICE_STATES.COMPLETADO).map(servicio => (
                 <ServicioCard key={servicio.id} servicio={servicio} />
               ))
             )}

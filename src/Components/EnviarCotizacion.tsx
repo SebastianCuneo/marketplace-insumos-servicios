@@ -5,9 +5,10 @@ import { Label } from './ui/label.tsx';
 import { Textarea } from './ui/textarea.tsx';
 import { Card } from './ui/card.tsx';
 import { ArrowLeft, Plus, X } from 'lucide-react';
-import { Servicio } from '../types';
+import type { Servicio, Cotizacion } from '../types';
 import { toast } from 'sonner';
 import React from 'react';
+import { useAuth, useServices } from '../contexts/index.ts';
 
 interface EnviarCotizacionProps {
   servicio: Servicio;
@@ -15,6 +16,9 @@ interface EnviarCotizacionProps {
 }
 
 export function EnviarCotizacion({ servicio, onVolver }: EnviarCotizacionProps) {
+  const { user } = useAuth();
+  const { addQuotation } = useServices();
+  
   const [precio, setPrecio] = useState('');
   const [plazo, setPlazo] = useState('');
   const [notas, setNotas] = useState('');
@@ -58,6 +62,28 @@ export function EnviarCotizacion({ servicio, onVolver }: EnviarCotizacionProps) 
       toast.error('Por favor completa el precio y el plazo');
       return;
     }
+    
+    if (!user) {
+      toast.error('Debes estar logueado para enviar una cotización');
+      return;
+    }
+    
+    const nuevaCotizacion: Cotizacion = {
+      id: `cot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      servicioId: servicio.id,
+      proveedorId: user.id,
+      proveedorNombre: user.nombre,
+      proveedorRating: user.rating || 4.0,
+      precio: parseFloat(precio),
+      plazo,
+      notas,
+      itemsIncluidos: itemsIncluidos.filter(i => i.trim() !== ''),
+      itemsExcluidos: itemsExcluidos.filter(i => i.trim() !== ''),
+      estado: 'enviada',
+      fechaEnvio: new Date().toISOString(),
+    };
+    
+    addQuotation(nuevaCotizacion);
     toast.success('Cotización enviada exitosamente');
     onVolver();
   };

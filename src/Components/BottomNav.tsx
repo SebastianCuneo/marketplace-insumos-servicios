@@ -1,5 +1,6 @@
 ﻿import { Home, FileText, Package, User, Plus } from 'lucide-react';
 import { UserRole } from '../types';
+import { ROLES } from '../constants/roles.ts';
 import React from 'react';
 
 interface BottomNavProps {
@@ -29,11 +30,11 @@ export function BottomNav({ role, activeTab, onTabChange }: BottomNavProps) {
 
   const getItems = () => {
     switch (role) {
-      case 'solicitante':
+      case ROLES.SOLICITANTE:
         return getSolicitanteItems();
-      case 'proveedor-servicio':
+      case ROLES.PROVEEDOR_SERVICIO:
         return getProveedorServicioItems();
-      case 'proveedor-insumos':
+      case ROLES.PROVEEDOR_INSUMOS:
         return getProveedorInsumosItems();
       default:
         return [];

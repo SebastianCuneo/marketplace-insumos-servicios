@@ -9,6 +9,7 @@ import { ArrowLeft, Plus, Trash2, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { mockServicios, mockInsumosCatalogo } from '../data/mockData.ts';
 import React from 'react';
+import { SERVICE_STATES } from '../constants/serviceStates.ts';
 
 interface OfrecerPackProps {
   onVolver: () => void;
@@ -28,7 +29,7 @@ export function OfrecerPack({ onVolver }: OfrecerPackProps) {
   const [items, setItems] = useState<ItemPack[]>([]);
   const [notas, setNotas] = useState('');
 
-  const serviciosDisponibles = mockServicios.filter(s => s.estado === 'publicado');
+  const serviciosDisponibles = mockServicios.filter(s => s.estado === SERVICE_STATES.PUBLICADO);
 
   const agregarItem = () => {
     const nuevoItem: ItemPack = {

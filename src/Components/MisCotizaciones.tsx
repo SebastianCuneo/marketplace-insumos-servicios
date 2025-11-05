@@ -3,18 +3,21 @@ import { Card } from './ui/card.tsx';
 import { Button } from './ui/button.tsx';
 import { Badge } from './ui/badge.tsx';
 import { ArrowLeft, FileText, Clock, CheckCircle, XCircle } from 'lucide-react';
-import { mockCotizaciones, mockServicios } from '../data/mockData.ts';
 import { EstadoCotizacion } from '../types';
 import React from 'react';
+import { useAuth, useServices } from '../contexts/index.ts';
 
 interface MisCotizacionesProps {
   onVolver: () => void;
 }
 
 export function MisCotizaciones({ onVolver }: MisCotizacionesProps) {
+  const { user } = useAuth();
+  const { state, services } = useServices();
   const [filtroEstado, setFiltroEstado] = useState<EstadoCotizacion | 'todas'>('todas');
 
-  const cotizaciones = mockCotizaciones;
+  // Filtrar cotizaciones del proveedor actual
+  const misCotizaciones = state.quotes.filter(c => c.proveedorId === user?.id);
 
   const getEstadoBadge = (estado: EstadoCotizacion) => {
     const styles = {
@@ -26,11 +29,11 @@ export function MisCotizaciones({ onVolver }: MisCotizacionesProps) {
   };
 
   const cotizacionesFiltradas = filtroEstado === 'todas' 
-    ? cotizaciones 
-    : cotizaciones.filter(c => c.estado === filtroEstado);
+    ? misCotizaciones 
+    : misCotizaciones.filter(c => c.estado === filtroEstado);
 
   const getServicio = (servicioId: string) => {
-    return mockServicios.find(s => s.id === servicioId);
+    return services.find(s => s.id === servicioId);
   };
 
   return (
@@ -61,7 +64,7 @@ export function MisCotizaciones({ onVolver }: MisCotizacionesProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Enviadas</p>
-                <p className="text-2xl">{cotizaciones.filter(c => c.estado === 'enviada').length}</p>
+                <p className="text-2xl">{misCotizaciones.filter(c => c.estado === 'enviada').length}</p>
               </div>
             </div>
           </Card>
@@ -73,7 +76,7 @@ export function MisCotizaciones({ onVolver }: MisCotizacionesProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Aceptadas</p>
-                <p className="text-2xl">{cotizaciones.filter(c => c.estado === 'aceptada').length}</p>
+                <p className="text-2xl">{misCotizaciones.filter(c => c.estado === 'aceptada').length}</p>
               </div>
             </div>
           </Card>
@@ -85,7 +88,7 @@ export function MisCotizaciones({ onVolver }: MisCotizacionesProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Retiradas</p>
-                <p className="text-2xl">{cotizaciones.filter(c => c.estado === 'retirada').length}</p>
+                <p className="text-2xl">{misCotizaciones.filter(c => c.estado === 'retirada').length}</p>
               </div>
             </div>
           </Card>

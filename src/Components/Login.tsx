@@ -2,23 +2,20 @@
 import { Button } from './ui/button.tsx';
 import { Input } from './ui/input.tsx';
 import { Label } from './ui/label.tsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.tsx';
 import { Card } from './ui/card.tsx';
-import { UserRole } from '../types';
 import { Package2 } from 'lucide-react';
 import React from 'react';
-import { useAuth } from '../Context/AuthContext.tsx';
+import { useAuth } from '../contexts/index.ts';
 
 interface LoginProps {
-  onLogin: (role: UserRole) => void;
+  onLogin: () => void;
 }
 
 export function Login({ onLogin }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('solicitante');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, state } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,10 +37,10 @@ export function Login({ onLogin }: LoginProps) {
     if (success) {
       // Login exitoso, limpiar error y continuar al dashboard
       setError('');
-      onLogin(role);
+      onLogin();
     } else {
       // Login fallido, mostrar error
-      setError('Email o contraseña incorrectos');
+      setError(state.error || 'Email o contraseña incorrectos');
     }
   };
 
@@ -87,20 +84,6 @@ export function Login({ onLogin }: LoginProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="role">Tipo de usuario</Label>
-            <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
-              <SelectTrigger className="rounded-lg">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="solicitante">Solicitante de Servicios</SelectItem>
-                <SelectItem value="proveedor-servicio">Proveedor de Servicios</SelectItem>
-                <SelectItem value="proveedor-insumos">Proveedor de Insumos</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {error && (
             <p className="text-sm text-red-500">{error}</p>
           )}
@@ -121,8 +104,9 @@ export function Login({ onLogin }: LoginProps) {
         <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <p className="text-xs font-semibold text-blue-900 mb-2">🔑 Credenciales de prueba:</p>
           <div className="text-xs text-blue-800 space-y-1">
-            <p><strong>Admin:</strong> admin@example.com / admin</p>
-            <p><strong>Usuario:</strong> user@example.com / user</p>
+            <p><strong>Solicitante:</strong> juan@email.com / password123</p>
+            <p><strong>Proveedor Servicio:</strong> maria@email.com / password123</p>
+            <p><strong>Proveedor Insumos:</strong> carlos@email.com / password123</p>
           </div>
         </div>
       </Card>

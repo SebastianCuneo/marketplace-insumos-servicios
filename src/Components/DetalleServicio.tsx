@@ -1,13 +1,13 @@
-﻿import { useState } from 'react';
-import { Button } from './ui/button.tsx';
+﻿import { Button } from './ui/button.tsx';
 import { Card } from './ui/card.tsx';
 import { Badge } from './ui/badge.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs.tsx';
 import { ArrowLeft, MapPin, Calendar, Package, Star, CheckCircle } from 'lucide-react';
 import { Servicio } from '../types';
-import { mockCotizaciones, mockOfertasInsumos } from '../data/mockData.ts';
 import { toast } from 'sonner';
 import React from 'react';
+import { useAuth, useServices } from '../contexts/index.ts';
+import { SERVICE_STATES } from '../constants/serviceStates';
 
 interface DetalleServicioProps {
   servicio: Servicio;
@@ -16,15 +16,15 @@ interface DetalleServicioProps {
 }
 
 export function DetalleServicio({ servicio, onVolver, onComparar }: DetalleServicioProps) {
-  const [cotizacionSeleccionada, setCotizacionSeleccionada] = useState<string | null>(
-    servicio.cotizacionSeleccionada || null
-  );
-
-  const cotizaciones = mockCotizaciones.filter(c => c.servicioId === servicio.id);
-  const ofertas = mockOfertasInsumos.filter(o => o.servicioId === servicio.id);
+  const { user } = useAuth();
+  const { state, selectQuotation } = useServices();
+  
+  // Obtener cotizaciones y ofertas del Context
+  const cotizaciones = state.quotes?.filter(c => c.servicioId === servicio.id) || [];
+  const ofertas = state.supplyOffers?.filter(o => o.servicioId === servicio.id) || [];
 
   const handleSeleccionarCotizacion = (cotizacionId: string) => {
-    setCotizacionSeleccionada(cotizacionId);
+    selectQuotation(servicio.id, cotizacionId);
     toast.success('Cotización seleccionada exitosamente');
   };
 
@@ -66,7 +66,7 @@ export function DetalleServicio({ servicio, onVolver, onComparar }: DetalleServi
               <Calendar className="w-5 h-5 text-[#2D7CF6]" />
               <div>
                 <p className="text-sm text-gray-500">Fecha deseada</p>
-                <p>{new Date(servicio.fecha).toLocaleDateString('es-ES', { 
+                <p>{new Date(servicio.fechaPreferida || servicio.fecha).toLocaleDateString('es-ES', { 
                   day: 'numeric', 
                   month: 'long', 
                   year: 'numeric' 
@@ -81,7 +81,7 @@ export function DetalleServicio({ servicio, onVolver, onComparar }: DetalleServi
               <h3>Insumos requeridos</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {servicio.insumos.map((insumo) => (
+              {(servicio.insumosRequeridos || servicio.insumos).map((insumo) => (
                 <div key={insumo.id} className="flex justify-between p-2 bg-gray-50 rounded-lg">
                   <span>{insumo.nombre}</span>
                   <span className="text-gray-600">{insumo.cantidad} {insumo.unidad}</span>
@@ -125,7 +125,7 @@ export function DetalleServicio({ servicio, onVolver, onComparar }: DetalleServi
                 
                 {cotizaciones.map((cotizacion) => (
                   <Card key={cotizacion.id} className={`p-6 rounded-lg ${
-                    cotizacionSeleccionada === cotizacion.id ? 'border-2 border-[#2D7CF6]' : ''
+                    servicio.cotizacionSeleccionada === cotizacion.id ? 'border-2 border-[#2D7CF6]' : ''
                   }`}>
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -173,7 +173,7 @@ export function DetalleServicio({ servicio, onVolver, onComparar }: DetalleServi
                       </div>
                     </div>
 
-                    {cotizacionSeleccionada === cotizacion.id ? (
+                    {servicio.cotizacionSeleccionada === cotizacion.id ? (
                       <Badge className="w-full justify-center bg-green-100 text-green-700">
                         <CheckCircle className="w-4 h-4 mr-2" />
                         Cotización seleccionada

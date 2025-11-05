@@ -5,9 +5,10 @@ import { Input } from './ui/input.tsx';
 import { Label } from './ui/label.tsx';
 import { Badge } from './ui/badge.tsx';
 import { User, Mail, Phone, Star, LogOut } from 'lucide-react';
-import { UserRole, Usuario } from '../types';
-import { mockUsuarios } from '../data/mockData.ts';
+import { UserRole } from '../types';
 import React from 'react';
+import { useAuth } from '../contexts/index.ts';
+import { ROLES } from '../constants/roles.ts';
 
 interface PerfilProps {
   role: UserRole;
@@ -15,17 +16,19 @@ interface PerfilProps {
 }
 
 export function Perfil({ role, onLogout }: PerfilProps) {
-  const usuario = mockUsuarios.find(u => u.rol === role) || mockUsuarios[0];
+  const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
   const getRoleName = (rol: UserRole) => {
     const names = {
-      'solicitante': 'Solicitante de Servicios',
-      'proveedor-servicio': 'Proveedor de Servicios',
-      'proveedor-insumos': 'Proveedor de Insumos',
+      [ROLES.SOLICITANTE]: 'Solicitante de Servicios',
+      [ROLES.PROVEEDOR_SERVICIO]: 'Proveedor de Servicios',
+      [ROLES.PROVEEDOR_INSUMOS]: 'Proveedor de Insumos',
     };
-    return names[rol];
+    return names[rol] || rol;
   };
+  
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] p-4 pb-20">
@@ -42,14 +45,14 @@ export function Perfil({ role, onLogout }: PerfilProps) {
             <div className="w-24 h-24 bg-[#2D7CF6] rounded-full flex items-center justify-center mb-4">
               <User className="w-12 h-12 text-white" />
             </div>
-            <h2 className="mb-2">{usuario.nombre}</h2>
+            <h2 className="mb-2">{user.nombre}</h2>
             <Badge className="bg-blue-100 text-blue-700">
-              {getRoleName(usuario.rol)}
+              {getRoleName(user.rol)}
             </Badge>
-            {usuario.rating && (
+            {user.rating && (
               <div className="flex items-center gap-1 mt-2">
                 <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                <span className="text-lg">{usuario.rating}</span>
+                <span className="text-lg">{user.rating.toFixed(1)}</span>
                 <span className="text-sm text-gray-500">/5.0</span>
               </div>
             )}
@@ -62,7 +65,7 @@ export function Perfil({ role, onLogout }: PerfilProps) {
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input
                   id="nombre"
-                  value={usuario.nombre}
+                  value={user.nombre}
                   disabled={!isEditing}
                   className="pl-10 rounded-lg"
                 />
@@ -76,7 +79,7 @@ export function Perfil({ role, onLogout }: PerfilProps) {
                 <Input
                   id="email"
                   type="email"
-                  value={usuario.email}
+                  value={user.email}
                   disabled={!isEditing}
                   className="pl-10 rounded-lg"
                 />
@@ -90,7 +93,7 @@ export function Perfil({ role, onLogout }: PerfilProps) {
                 <Input
                   id="telefono"
                   type="tel"
-                  value={usuario.telefono || ''}
+                  value={user.telefono || ''}
                   disabled={!isEditing}
                   className="pl-10 rounded-lg"
                 />
@@ -127,24 +130,24 @@ export function Perfil({ role, onLogout }: PerfilProps) {
         </Card>
 
         {/* Stats Card (for providers) */}
-        {role !== 'solicitante' && (
+        {role !== ROLES.SOLICITANTE && (
           <Card className="p-6 rounded-lg">
             <h3 className="mb-4">Estadísticas</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <p className="text-2xl text-[#2D7CF6] mb-1">
-                  {role === 'proveedor-servicio' ? '12' : '45'}
+                  {role === ROLES.PROVEEDOR_SERVICIO ? '12' : '45'}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {role === 'proveedor-servicio' ? 'Servicios realizados' : 'Insumos en catálogo'}
+                  {role === ROLES.PROVEEDOR_SERVICIO ? 'Servicios realizados' : 'Insumos en catálogo'}
                 </p>
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <p className="text-2xl text-green-600 mb-1">
-                  {role === 'proveedor-servicio' ? '8' : '23'}
+                  {role === ROLES.PROVEEDOR_SERVICIO ? '8' : '23'}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {role === 'proveedor-servicio' ? 'Cotizaciones activas' : 'Ofertas enviadas'}
+                  {role === ROLES.PROVEEDOR_SERVICIO ? 'Cotizaciones activas' : 'Ofertas enviadas'}
                 </p>
               </div>
             </div>
