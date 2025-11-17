@@ -20,14 +20,14 @@ export function Login({ onLogin }: LoginProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validar que haya email y contrase�a
+    // Validar que haya email y contraseña
     if (!email) {
       setError('Por favor ingresa tu email');
       return;
     }
     
     if (!password) {
-      setError('Por favor ingresa tu contrase�a');
+      setError('Por favor ingresa tu contraseña');
       return;
     }
     
@@ -40,7 +40,7 @@ export function Login({ onLogin }: LoginProps) {
       onLogin();
     } else {
       // Login fallido, mostrar error
-      setError(state.error || 'Email o contrase�a incorrectos');
+      setError(state.error || 'Email o contraseña incorrectos');
     }
   };
 
@@ -73,11 +73,11 @@ export function Login({ onLogin }: LoginProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Contrase�a</Label>
+            <Label htmlFor="password">Contraseña</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Ingresa tu contrase�a"
+              placeholder="Ingresa tu contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="rounded-lg"
@@ -97,12 +97,12 @@ export function Login({ onLogin }: LoginProps) {
         </form>
 
         <div className="text-center text-sm text-gray-500">
-          <p>�No tienes cuenta? <span className="text-[#2D7CF6] cursor-pointer">Reg�strate</span></p>
+          <p>¿No tienes cuenta? <span className="text-[#2D7CF6] cursor-pointer">Regístrate</span></p>
         </div>
 
         {/* Credenciales de prueba */}
         <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-xs font-semibold text-blue-900 mb-2">?? Credenciales de prueba:</p>
+          <p className="text-xs font-semibold text-blue-900 mb-2">💡 Credenciales de prueba:</p>
           <div className="text-xs text-blue-800 space-y-1">
             <p><strong>Solicitante:</strong> solicitante@marketplace.com / solicitante123</p>
             <p><strong>Proveedor Servicio:</strong> proveedor@marketplace.com / proveedor123</p>
