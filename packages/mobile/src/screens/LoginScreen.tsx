@@ -1,171 +1,126 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { TextInput, Button, Text, Card, Title, Paragraph, HelperText } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useAuth } from '@marketplace/shared';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { TextInput, Button, Text, Card } from 'react-native-paper';
+import { useAuth } from '../shared/contexts/AuthContext';
 
-export default function LoginScreen() {
-  const { login, state } = useAuth();
+export default function LoginScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const { login, state } = useAuth();
 
   const handleLogin = () => {
+    // Validar campos
     if (!email) {
       setError('Por favor ingresa tu email');
       return;
     }
+    
     if (!password) {
       setError('Por favor ingresa tu contraseña');
       return;
     }
-
+    
+    // Intentar login con el contexto
     const success = login(email, password);
-    if (!success) {
+    
+    if (success) {
+      setError('');
+      navigation.replace('Main');
+    } else {
       setError(state.error || 'Email o contraseña incorrectos');
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <Icon name="store" size={48} color="#fff" />
-          </View>
-          <Title style={styles.title}>Marketplace de Servicios</Title>
-          <Paragraph style={styles.subtitle}>
-            Conecta con proveedores de servicios e insumos
-          </Paragraph>
-        </View>
+    <View style={styles.container}>
+      <Card style={styles.card}>
+        <Card.Content>
+          <Text variant="headlineMedium" style={styles.title}>
+            Marketplace
+          </Text>
+          <Text variant="bodyMedium" style={styles.subtitle}>
+            Servicios con Insumos
+          </Text>
 
-        <Card style={styles.card}>
-          <Card.Content>
-            <TextInput
-              label="Email"
-              value={email}
-              onChangeText={setEmail}
-              mode="outlined"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              left={<TextInput.Icon icon="email" />}
-              style={styles.input}
-            />
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            mode="outlined"
+            style={styles.input}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
 
-            <TextInput
-              label="Contraseña"
-              value={password}
-              onChangeText={setPassword}
-              mode="outlined"
-              secureTextEntry={!showPassword}
-              left={<TextInput.Icon icon="lock" />}
-              right={
-                <TextInput.Icon
-                  icon={showPassword ? 'eye-off' : 'eye'}
-                  onPress={() => setShowPassword(!showPassword)}
-                />
-              }
-              style={styles.input}
-            />
+          <TextInput
+            label="Contraseña"
+            value={password}
+            onChangeText={setPassword}
+            mode="outlined"
+            secureTextEntry
+            style={styles.input}
+          />
 
-            {error && (
-              <HelperText type="error" visible={!!error}>
-                {error}
-              </HelperText>
-            )}
+          {error && (
+            <Text style={styles.error}>{error}</Text>
+          )}
 
-            <Button
-              mode="contained"
-              onPress={handleLogin}
-              style={styles.button}
-              buttonColor="#2D7CF6"
-              loading={state.loading}
-            >
-              Ingresar
-            </Button>
-          </Card.Content>
-        </Card>
+          <Button
+            mode="contained"
+            onPress={handleLogin}
+            style={styles.button}
+          >
+            Iniciar Sesión
+          </Button>
 
-        <Card style={styles.credentialsCard}>
-          <Card.Content>
-            <Text style={styles.credentialsTitle}>🔑 Credenciales de prueba:</Text>
-            <Text style={styles.credentialText}>
-              <Text style={styles.bold}>Solicitante:</Text> solicitante@marketplace.com / solicitante123
-            </Text>
-            <Text style={styles.credentialText}>
-              <Text style={styles.bold}>Proveedor Servicio:</Text> proveedor@marketplace.com / proveedor123
-            </Text>
-            <Text style={styles.credentialText}>
-              <Text style={styles.bold}>Proveedor Insumos:</Text> insumos@marketplace.com / insumos123
-            </Text>
-          </Card.Content>
-        </Card>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          <Text variant="bodySmall" style={styles.hint}>
+            Credenciales de prueba:{'\n'}
+            solicitante@marketplace.com / solicitante123{'\n'}
+            proveedor@marketplace.com / proveedor123{'\n'}
+            insumos@marketplace.com / insumos123
+          </Text>
+        </Card.Content>
+      </Card>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  scrollContent: {
-    flexGrow: 1,
+    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
-    padding: 20,
+    padding: 16,
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  iconContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 24,
-    backgroundColor: '#2D7CF6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
+  card: {
+    padding: 16,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    textAlign: 'center',
     marginBottom: 8,
+    fontWeight: 'bold',
   },
   subtitle: {
     textAlign: 'center',
+    marginBottom: 24,
     color: '#666',
   },
-  card: {
-    marginBottom: 16,
-  },
   input: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   button: {
     marginTop: 8,
-    paddingVertical: 6,
+    marginBottom: 16,
   },
-  credentialsCard: {
-    backgroundColor: '#E3F2FD',
+  hint: {
+    textAlign: 'center',
+    color: '#666',
   },
-  credentialsTitle: {
-    fontWeight: 'bold',
-    color: '#1565C0',
-    marginBottom: 8,
-  },
-  credentialText: {
-    fontSize: 12,
-    color: '#1976D2',
-    marginBottom: 4,
-  },
-  bold: {
-    fontWeight: 'bold',
+  error: {
+    color: '#d32f2f',
+    fontSize: 14,
+    marginBottom: 12,
   },
 });
 
